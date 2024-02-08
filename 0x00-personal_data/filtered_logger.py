@@ -79,3 +79,24 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     )
 
     return connect
+
+
+def main():
+    '''Main entry point for logging user data'''
+
+    database = get_db()
+    logger_instance = get_logger()
+    db_cursor = database.cursor()
+    db_cursor.execute("SELECT * FROM users;")
+    column_names = db_cursor.column_names
+
+    for row_data in db_cursor:
+        mssg = "".join(f"{k}={v}; " for k, v in zip(column_names, row_data))
+        logger_instance.info(mssg.strip())
+
+    db_cursor.close()
+    database.close()
+
+
+if __name__ == "__main__":
+    main()
