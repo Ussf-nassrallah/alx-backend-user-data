@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 ''' filtered_logger module '''
 
+import os
 import logging
 import re
 from typing import List
+import mysql.connector
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
@@ -59,3 +61,21 @@ def get_logger() -> logging.Logger:
     user.addHandler(streamHandler)
 
     return user
+
+
+def get_db() -> mysql.connector.connect:
+    """get_db method thats connect with mysql database"""
+
+    username = os.environ.get("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.environ.get("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.environ.get("PERSONAL_DATA_DB_NAME")
+
+    database = mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name
+    )
+
+    return database
