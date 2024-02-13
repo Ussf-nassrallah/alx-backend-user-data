@@ -34,13 +34,11 @@ def before_request():
     ]
 
     if auth.require_auth(request.path, paths):
-        abort(401)
+        if auth.authorization_header(request) is None:
+            abort(401)
 
-    if auth.authorization_header(request) is None:
-        abort(401)
-
-    if auth.current_user(request) is None:
-        abort(403)
+        if auth.current_user(request) is None:
+            abort(403)
 
 
 @app.errorhandler(404)
