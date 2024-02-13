@@ -10,6 +10,7 @@ class BasicAuth(Auth):
         self,
         authorization_header: str
     ) -> str:
+        ''' extract_base64_authorization_header method '''
         if authorization_header is None\
                 or not isinstance(authorization_header, str)\
                 or authorization_header[:6] != 'Basic ':
