@@ -24,20 +24,19 @@ if AUTH_TYPE is 'auth':
 @app.before_request
 def before_request():
     ''' before_request method for handling requests '''
-    if auth is None:
-        return
-    paths = [
-        '/api/v1/status/',
-        '/api/v1/unauthorized/',
-        '/api/v1/forbidden/'
-    ]
-    if request.path not in paths:
-        if not auth.require_auth(request.path, excluded_paths):
-            abort(401)
-        if auth.authorization_header(request) is None:
-            abort(401)
-        if auth.current_user(request) is None:
-            abort(403)
+    if auth:
+        paths = [
+            '/api/v1/status/',
+            '/api/v1/unauthorized/',
+            '/api/v1/forbidden/',
+        ]
+        if auth.require_auth(request.path, paths):
+            header_auth = auth.authorization_header(request)
+            current_user = auth.current_user(request)
+            if header_auth is None:
+                abort(401)
+            if current_user is None:
+                abort(403)
 
 
 @app.errorhandler(404)
