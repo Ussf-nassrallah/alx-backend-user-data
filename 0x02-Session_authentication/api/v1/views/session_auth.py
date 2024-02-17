@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+''' session_auth viewer '''
 
 from flask import request, jsonify
 from api.v1.views import app_views
