@@ -51,3 +51,15 @@ class Auth:
         # is_valid should can be True or False
         is_valid = bcrypt.checkpw(encoded_user_passw, hash_user_passw)
         return is_valid
+
+    def create_session(self, email: str) -> str:
+        ''' create_session method '''
+        try:
+            # get user from DB
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            # return None if user not exists
+            return None
+        sess_id = _generate_uuid()
+        self._db.update_user(user.id, session_id=sess_id)
+        return sess_id
