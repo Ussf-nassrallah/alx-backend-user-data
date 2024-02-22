@@ -34,13 +34,12 @@ def login():
     user_passw = request.form.get('password')
 
     user = auth.valid_login(user_email, user_passw)
-
     if not user:
         abort(401)
-
-    auth.create_session(user_email)
-
-    return jsonify({"email": user_email, "message": "logged in"})
+    else:
+        session_id = auth.create_session(user_email)
+        user['session_id'] = session_id
+        return jsonify({"email": user_email, "message": "logged in"})
 
 
 if __name__ == '__main__':
