@@ -36,11 +36,11 @@ def login():
     user = auth.valid_login(user_email, user_passw)
     if not user:
         abort(401)
-    else:
-        session_id = auth.create_session(user_email)
-        response = jsonify({"email": user_email, "message": "logged in"})
-        response.set_cookie("session_id", session_id)
-        return response
+
+    session_id = auth.create_session(user_email)
+    response = jsonify({"email": user_email, "message": "logged in"})
+    response.set_cookie("session_id", session_id)
+    return response
 
 
 if __name__ == '__main__':
