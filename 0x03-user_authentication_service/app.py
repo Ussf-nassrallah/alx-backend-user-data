@@ -30,16 +30,44 @@ def users():
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
 def login() -> str:
     ''' handle user login '''
-    email = request.form.get('email')
-    password = request.form.get('password')
+    user_email = request.form.get('email')
+    user_pssw = request.form.get('password')
 
-    if auth.valid_login(email, password):
-        session_id = auth.create_session(email)
-        reply = jsonify({"email": email, "message": "logged in"})
-        reply.set_cookie("session_id", session_id)
-        return reply
+    user = auth.valid_login(user_email, user_pssw)
+    if not user:
+        abort(401)
 
-    abort(401)
+    session_id = auth.create_session(user_email)
+    response = jsonify({"email": user_email, "message": "logged in"})
+    response.set_cookie("session_id", session_id)
+    return response
+
+
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
+def logout() -> str:
+    ''' handle user logout '''
+    session_id = request.cookies.get("session_id")
+
+    if session_id is None:
+        abort(403)
+
+    user = auth.get_user_from_session_id(session_id)
+
+    if user is None:
+        abort(403)
+
+    auth.destroy_session(user.id)
+    return redirect('/')
+
+
+@app.route('/profile', methods=['GET'], strict_slashes=False)
+def profile():
+    ''' get user profile '''
+    session_id = request.cookies.get('session_id')
+    user = auth.get_user_from_session_id(session_id)
+    if user:
+        return jsonify({"email": f"{user.email}"}), 200
+    abort(403)
 
 
 if __name__ == '__main__':
