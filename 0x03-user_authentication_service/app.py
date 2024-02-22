@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ''' set up a Flask app '''
 
-from flask import Flask, jsonify, request, abort, redirect
+from flask import Flask, jsonify, request, abort, redirect, make_response
 from auth import Auth
 
 
@@ -30,34 +30,15 @@ def users():
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
 def login() -> str:
     ''' handle user login '''
-    user_email = request.form.get('email')
-    user_pssw = request.form.get('password')
-
-    user = auth.valid_login(user_email, user_pssw)
-    if not user:
+    user_email = request.form.get('email', '')
+    user_password = request.form.get('password', '')
+    login = AUTH.valid_login(user_email, user_password)
+    if not login:
         abort(401)
-
-    session_id = auth.create_session(user_email)
-    response = jsonify({"email": user_email, "message": "logged in"})
-    response.set_cookie("session_id", session_id)
-    return response
-
-
-@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
-def logout() -> str:
-    ''' handle user logout '''
-    session_id = request.cookies.get("session_id")
-
-    if session_id is None:
-        abort(403)
-
-    user = auth.get_user_from_session_id(session_id)
-
-    if user is None:
-        abort(403)
-
-    auth.destroy_session(user.id)
-    return redirect('/')
+    resp = make_response(jsonify({"email": user_email,
+                                  "message": "logged in"}))
+    resp.set_cookie('session_id', AUTH.create_session(user_email))
+    return resp
 
 
 if __name__ == '__main__':
