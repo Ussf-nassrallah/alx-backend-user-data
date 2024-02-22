@@ -47,13 +47,17 @@ def login() -> str:
 def logout() -> str:
     ''' handle user logout '''
     session_id = request.cookies.get("session_id")
+
+    if session_id is None:
+        abort(403)
+
     user = auth.get_user_from_session_id(session_id)
 
     if user is None:
         abort(403)
-    auth.destroy_session(user.id)
 
-    return redirect("/")
+    auth.destroy_session(user.id)
+    return redirect('/')
 
 
 if __name__ == '__main__':
